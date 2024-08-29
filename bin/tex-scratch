@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+tmpdir=$(mktemp --tmpdir -d texscratch.XXX)
+basename="main.tex"
+
+file="${tmpdir}/${basename}"
+
+cat << EOF > "${file}"
+\documentclass[10pt]{article}
+
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{ulem}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\pagestyle{fancy}
+
+\fancyhead[L]{}
+\fancyhead[C]{Scratch}
+\fancyhead[R]{}
+
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{}
+
+\newcommand{\Fun}{\operatorname{Fun}}
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+\setlength\parindent{0pt}
+
+\[\Fun_a^b\]
+
+\[\begin{pmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23}
+\end{pmatrix}\]
+
+\[\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23}
+\end{bmatrix}\]
+
+
+\begin{proof}
+This is a proof.
+\end{proof}
+
+
+\[\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}\]
+
+\[ \left( \sum_{n=0}^N \left( \frac{1}{a+b}\right)^2 \right)^2 \]
+
+\end{document}
+EOF
+
+cat << EOF
+cd "${tmpdir}"
+tmux
+vim "${basename}"
+echo "${basename}" | entr latex-to-pdf "${basename}"
+firefox "${basename/%tex/pdf}"
+EOF

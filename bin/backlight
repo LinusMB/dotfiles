@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+# https://gitlab.com/wavexx/acpilight/-/blob/master/xbacklight
+
+import argparse
+import os
+from collections import OrderedDict
+
+PATH = "/sys/class/backlight"
+
+def die(msg):
+    print(sys.argv[0] + ": " + msg, file=sys.stderr)
+    sys.exit(1)
+
+def clamp(v, vmin, vmax):
+    return max(min(v, vmax), vmin)
+
+def get_controllers():
+    ctrls = OrderedDict()
+    for name in os.listdir(PATH):
+        ctrls[name] = os.path.join(PATH, name)
+    return ctrls
+
+def get_brightness(path):
+    return int(open(os.path.join(path, "brightness")).read())
+
+def get_max_brightness(path):
+    return int(open(os.path.join(path, "max_brightness")).read())
+
+def set_brightness(path, b):
+    open(os.path.join(path, "brightness"), "w").write(str(int(b)))
+
+def inc_brightness(path, amt):
+    b = clamp(get_brightness(path) + int(amt), 0, get_max_brightness(path))
+    set_brightness(path, b)
+    
+def dec_brightness(path, amt):
+    b = clamp(get_brightness(path) - int(amt), 0, get_max_brightness(path))
+    set_brightness(path, b)
+
+def run():
+    ap = argparse.ArgumentParser(description="backlight control")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("-list", action="store_true", help="list controllers")
+    g.add_argument("-get", action="store_true", help="get brightness")
+    g.add_argument("-set", type=int, help="set brightness")
+    g.add_argument("-inc", type=int, help="increase brightness")
+    g.add_argument("-dec", type=int, help="decrease brightness")
+    ap.add_argument("-ctrl", help="set controller to use")
+
+    args = ap.parse_args()
+
+    ctrls = get_controllers()
+    if args.list:
+        for name in ctrls:
+            print(name)
+        return
+
+    ctrl_path_def = next(iter(ctrls.values()))
+    ctrl_path = ctrls.get(args.ctrl, ctrl_path_def) if args.ctrl else ctrl_path_def
+
+    if args.get:
+        print(get_brightness(ctrl_path))
+    elif args.set is not None:
+        set_brightness(ctrl_path, args.set)
+    elif args.inc is not None:
+        inc_brightness(ctrl_path, args.inc)
+    elif args.dec is not None:
+        dec_brightness(ctrl_path, args.dec)
+
+if __name__ == "__main__":
+    run()

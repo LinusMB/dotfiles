@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+tmp_dir=$(mktemp --tmpdir -d nodescratch.XXX)
+
+cat << EOF > "${tmp_dir}/package.json"
+{
+  "name": "node-scratch",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "ramda": "*",
+    "date-fns": "*"
+  }
+}
+EOF
+
+cat << EOF > "${tmp_dir}/index.js"
+console.log("Hello, World!");
+EOF
+
+cat << EOF
+cd "${tmp_dir}"
+npm i
+npm run start
+EOF

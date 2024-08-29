@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+tmp_dir=$(mktemp --tmpdir -d goscratch.XXX)
+
+(cd "${tmp_dir}" && go mod init "goscratch")
+
+cat << EOF > "${tmp_dir}/main.go"
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+EOF
+
+cat << EOF
+cd "${tmp_dir}"
+go run main.go
+EOF

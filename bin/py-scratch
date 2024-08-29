@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+tmp_dir=$(mktemp --tmpdir -d pyscratch.XXX)
+
+cd "${tmp_dir}"
+python3 -m venv env
+cat << EOF > "${tmp_dir}/main.py"
+#!/usr/bin/env python3
+
+def main():
+    print("Hello, World!")
+
+main()
+EOF
+
+cat << EOF
+cd "${tmp_dir}"
+source env/bin/activate
+pip list  # should be empty
+pip install numpy matplotlib PyQt5
+EOF

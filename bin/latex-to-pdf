@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+need() {
+    for cmd in "$@"; do
+	command -v "${cmd}" >/dev/null 2>&1 || { printf "need ${cmd} but it's not installed.\n" 1>&2; exit 1; }
+    done
+}
+
+need "docker"
+
+usage() {
+    echo "Usage: $(basename ${0}) file"
+    exit
+}
+
+[[ -z "${1}" ]] && usage
+
+arg=$(readlink -f "${1}")
+
+dn=$(dirname "${arg}")
+fn=$(basename "${arg}")
+
+docker run \
+    -i \
+    --rm \
+    --name latex \
+    --user $(id -u):$(id -g) \
+    --volume "${dn}:/usr/src/app" \
+    -w /usr/src/app \
+    registry.gitlab.com/islandoftex/images/texlive:latest \
+    pdflatex \
+    -interaction=nonstopmode \
+    "${fn}"

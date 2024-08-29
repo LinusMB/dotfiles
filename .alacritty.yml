@@ -1,0 +1,36 @@
+window:
+  padding:
+    x: 0
+    y: 0
+
+title: terminal
+
+font:
+  normal:
+    family: Inconsolata
+    style: Regular
+  bold:
+    family: Inconsolata
+    style: Bold
+  offset:
+    x: 0
+    y: 0
+  size: 16
+
+cursor:
+  style: Block
+  blink_interval: 500
+
+url:
+  launcher:
+    program: xdg-open
+    args: []
+
+scrolling:
+  history: 1000
+  multiplier: 1
+
+colors:
+  primary:
+    background: '#0F0F0F'
+    foreground: '#FFFFFF'

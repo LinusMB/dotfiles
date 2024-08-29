@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+need() {
+    for cmd in "$@"; do
+	command -v "${cmd}" >/dev/null 2>&1 || { printf "need ${cmd} but it's not installed.\n" 1>&2; exit 1; }
+    done
+}
+
+need "docker"
+
+image_name="pandoc/latex:2.6"
+
+usage() {
+    echo "Usage: $(basename ${0}) file"
+    exit
+}
+
+[[ -z "${1}" ]] && usage
+
+arg=$(readlink -f "${1}")
+
+dn=$(dirname "${arg}")
+fn=$(basename "${arg}")
+
+docker run \
+     --rm \
+     --volume "${dn}:/data" \
+     --user $(id -u):$(id -g) \
+     "${image_name}" -t beamer "${fn}" -o "${fn%.*}.pdf"
