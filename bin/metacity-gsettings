@@ -8,7 +8,7 @@ cursor-size=32
 document-font-name='Overpass 10'
 enable-animations=false
 font-name='Overpass 10'
-monospace-font-name='Iosevka 14'
+monospace-font-name='Inconsolata 12'
 
 [org/gnome/desktop/wm/keybindings]
 close=['<Super>e']
