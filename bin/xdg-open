@@ -8,7 +8,7 @@ declare -A mimeapps
 
 mimeapps["application/pdf"]="firefox"
 mimeapps["text/html"]="firefox"
-mimeapps["text/plain"]="atom"
+mimeapps["text/plain"]="firefox"
 mimeapps["image/webp"]="firefox"
 mimeapps["image/png"]="firefox"
 mimeapps["image/gif"]="firefox"
@@ -38,4 +38,4 @@ if [ -e "${*}" ]; then
    mime="$(file -ib "${*}" | cut -d';' -f1)"
 fi
 
-[ -n "${mimeapps["${mime}"]}" ] && "${mimeapps["${mime}"]}" "${*}" &>/dev/null &
+[[ -v mimeapps[${mime}] ]] && "${mimeapps["${mime}"]}" "${*}" &>/dev/null &
