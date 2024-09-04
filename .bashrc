@@ -22,7 +22,6 @@ alias ls='ls -aF --group-directories-first'
 alias ll='ls -alh'
 alias df='df -h'
 alias free='free -h'
-alias gitdot='/usr/bin/git --git-dir=${HOME}/.dot/ --work-tree=${HOME}'
 
 PROMPT_COMMAND=__prompt_command
 
