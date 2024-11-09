@@ -1,0 +1,13 @@
+[user]
+	email = buddruslinus@gmail.com
+	name = Linus Buddrus
+
+[alias]
+	st = status
+	ci = commit --verbose
+	co = checkout
+	aa = add --all
+	lg = log --graph --pretty=format:'%h - %C(green)%cr%Creset %C(yellow)%d%Creset %s %C(bold blue)[%an]%Creset'
+	ls = ls-tree -r HEAD --name-only
+	sync = "!git pull origin $(git rev-parse --abbrev-ref HEAD) --rebase"
+	tree = "!git ls-tree --full-tree --name-only -r $1 | tree --fromfile . | less #"

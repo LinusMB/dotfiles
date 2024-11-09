@@ -1,0 +1,7 @@
+TAB: menu-complete
+
+set bell-style none
+set completion-ignore-case On
+set show-all-if-ambiguous On
+set revert-all-at-newline On
+set menu-complete-display-prefix On
