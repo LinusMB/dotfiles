@@ -30,7 +30,7 @@ _basic() {
     curl -fLo ~/.profile https://raw.githubusercontent.com/LinusMB/dotfiles/master/profile
     curl -fLo ~/.gitconfig https://raw.githubusercontent.com/LinusMB/dotfiles/master/gitconfig
     curl -fLo ~/.inputrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/inputrc
-    curl -fLo ~/.alacritty.yml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.yml
+    curl -fLo ~/.alacritty.toml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.toml
     curl -fLo ~/.tmux.conf https://raw.githubusercontent.com/LinusMB/dotfiles/master/tmux.conf
 }
 

@@ -1,0 +1,16 @@
+[font]
+size = 15
+
+[font.normal]
+family = "Inconsolata"
+style = "Regular"
+
+[font.bold]
+family = "Inconsolata"
+style = "Bold"
+
+[cursor]
+style = "Block"
+
+[scrolling]
+history = 10000
