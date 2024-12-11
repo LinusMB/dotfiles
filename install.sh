@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
 
-_packages() { 
+_packages() {
     sudo add-apt-repository -y ppa:aslatter/ppa
     sudo apt-get -y update
 
@@ -17,6 +18,7 @@ _packages() {
         vim-gtk3 \
         moreutils \
         jq \
+        shellcheck \
         shfmt \
         black \
         clang-format \
@@ -37,6 +39,7 @@ _vim() {
     mkdir -p ~/.vim/colors
 
     git clone --depth 1 https://github.com/tpope/vim-surround.git ~/.vim/pack/plugins/start/vim-surround
+    git clone --depth 1 https://github.com/tpope/vim-commentary ~/.vim/pack/plugins/start/vim-commentary
     git clone --depth 1 https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go
     git clone --depth 1 https://github.com/psf/black.git ~/.vim/pack/plugins/start/black
     git clone --depth 1 https://github.com/prettier/vim-prettier.git ~/.vim/pack/plugins/start/vim-prettier
@@ -47,10 +50,12 @@ _vim() {
 }
 
 _golang() {
-    local arch="$(dpkg --print-architecture)"
-    local ver="$(curl -s https://go.dev/VERSION?m=text | head -1)"
+    local arch
+    local ver
+    arch="$(dpkg --print-architecture)"
+    ver="$(curl -s https://go.dev/VERSION?m=text | head -1)"
 
-    curl -fsSL -o /tmp/go.tar.gz "https://go.dev/dl/${ver}.linux-${arch}.tar.gz"
+    curl -fLo /tmp/go.tar.gz "https://go.dev/dl/${ver}.linux-${arch}.tar.gz"
     sudo tar -C /usr/local -xzf /tmp/go.tar.gz --strip-components=1
     sudo rm /tmp/go.tar.gz
 
@@ -77,30 +82,30 @@ _golang() {
 }
 
 _vscode() {
-	code --install-extension golang.go
-	code --install-extension vscodevim.vim
-	code --install-extension ms-python.python
+    code --install-extension golang.go
+    code --install-extension vscodevim.vim
+    code --install-extension ms-python.python
     code --install-extension ms-python.black-formatter
 
-	local configfile="${HOME}/.config/Code/User/settings.json"
+    local configfile="~/.config/Code/User/settings.json"
 
-	printf '{}' > "${configfile}"
-	jq '. + {"editor.fontFamily": "Inconsolata"}' "${configfile}" | sponge "${configfile}"
-	jq '. + {"editor.fontSize": 16}' "${configfile}" | sponge "${configfile}"
-	jq '. + {"editor.cursorBlinking": "solid"}' "${configfile}" | sponge "${configfile}"
-	jq '. + {"editor.formatOnSave": true}' "${configfile}" | sponge "${configfile}"
+    printf '{}' >"${configfile}"
+    jq '. + {"editor.fontFamily": "Inconsolata"}' "${configfile}" | sponge "${configfile}"
+    jq '. + {"editor.fontSize": 16}' "${configfile}" | sponge "${configfile}"
+    jq '. + {"editor.cursorBlinking": "solid"}' "${configfile}" | sponge "${configfile}"
+    jq '. + {"editor.formatOnSave": true}' "${configfile}" | sponge "${configfile}"
     jq '. + {"editor.autoClosingBrackets": "never"}' "${configfile}" | sponge "${configfile}"
     jq '. + {"terminal.integrated.fontSize": 16}' "${configfile}" | sponge "${configfile}"
-	jq '. + {"terminal.integrated.allowChords": false}' "${configfile}" | sponge "${configfile}"
-    jq '. + { 
+    jq '. + {"terminal.integrated.allowChords": false}' "${configfile}" | sponge "${configfile}"
+    jq '. + {
                 "terminal.integrated.commandsToSkipShell": [
                     "-workbench.action.quickOpen",
                     "-workbench.action.terminal.deleteWordLeft"
-                ] 
+                ]
             }' "${configfile}" | sponge "${configfile}"
-	jq '. + {"terminal.integrated.sendKeybindingsToShell":true}' "${configfile}" | sponge "${configfile}"
+    jq '. + {"terminal.integrated.sendKeybindingsToShell":true}' "${configfile}" | sponge "${configfile}"
     jq '. + {"window.openFilesInNewWindow": "default"}' "${configfile}" | sponge "${configfile}"
-	jq '. + {"vim.useCtrlKeys": true}' "${configfile}" | sponge "${configfile}"
+    jq '. + {"vim.useCtrlKeys": true}' "${configfile}" | sponge "${configfile}"
     jq '. + {"vim.useSystemClipboard": true}' "${configfile}" | sponge "${configfile}"
     jq '. + {"vim.leader": "<space>"}' "${configfile}" | sponge "${configfile}"
     jq '. + {"vim.handleKeys": {"<C-j>": true, "<C-k>: true"}}' "${configfile}" | sponge "${configfile}"
@@ -135,13 +140,25 @@ _vscode() {
 }
 
 _overpassfont() {
-	mkdir -p "${HOME}/.local/share/fonts"
-	wget "https://github.com/RedHatOfficial/Overpass/releases/download/v3.0.5/overpass-3.0.5.zip" -O "/tmp/overpass-3.0.5.zip"
-	unzip -d "${HOME}/.local/share/fonts" "/tmp/overpass-3.0.5.zip"
-	fc-cache -f -v
+    mkdir -p ~/.local/share/fonts
+    curl -fLo /tmp/overpass-3.0.5.zip https://github.com/RedHatOfficial/Overpass/releases/download/v3.0.5/overpass-3.0.5.zip
+    unzip -d ~/.local/share/fonts /tmp/overpass-3.0.5.zip
+    fc-cache -f -v
+}
+
+_ktfmt() {
+    mkdir -p ~/bin
+    curl -fLo ~/ktfmt.jar https://github.com/facebook/ktfmt/releases/download/v0.53/ktfmt-0.53-jar-with-dependencies.jar
+    cat <<'EOF' >~/bin/ktfmt
+#!/usr/bin/env bash
+java -jar ~/ktfmt.jar --google-style "$@"
+EOF
+    chmod +x ~/bin/ktfmt
 }
 
 _packages
 _basic
 _vim
 _golang
+_overpassfont
+_ktfmt

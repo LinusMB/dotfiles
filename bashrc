@@ -1,6 +1,6 @@
 case $- in
-*i*) ;;
-*) return ;;
+    *i*) ;;
+    *) return ;;
 esac
 
 . /usr/share/bash-completion/bash_completion

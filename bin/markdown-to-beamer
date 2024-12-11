@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+set -eu -o pipefail
+
+need() {
+    if [ $# -eq 0 ]; then
+        return
+    fi
+
+    if ! hash "$1" 2>/dev/null; then
+        printf 'Need %s on path.\n' "$1"
+        exit 1
+    fi
+
+    shift
+
+    need "$@"
+}
+
+need docker
+
+image_name="pandoc/latex:2.6"
+
+usage() {
+    echo "Usage: $(basename "$0") file"
+    exit
+}
+
+[[ -z "$1" ]] && usage
+
+arg=$(readlink -f "$1")
+
+dn=$(dirname "${arg}")
+fn=$(basename "${arg}")
+
+docker run \
+    --rm \
+    --volume "${dn}:/data" \
+    --user "$(id -u):$(id -g)" \
+    "${image_name}" -t beamer "${fn}" -o "${fn%.*}.pdf"

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+set -eu -o pipefail
+
+declare -A mimeapps
+
+mimeapps["application/pdf"]="chromium"
+mimeapps["text/html"]="chromium"
+mimeapps["text/plain"]="chromium"
+mimeapps["image/webp"]="chromium"
+mimeapps["image/png"]="chromium"
+mimeapps["image/gif"]="chromium"
+mimeapps["inode/directory"]="pcmanfm"
+mimeapps["video/mp4"]="mpv"
+mimeapps["video/x-matroska"]="mpv"
+mimeapps["application/x-bittorrent"]=":"
+mimeapps["x-scheme-handler/irc"]=":"
+
+mime=""
+
+if [[ "$*" =~ ^([a-zA-Z-]+): ]]; then
+    case "${BASH_REMATCH[1]}" in
+        http | https)
+            mime=text/html
+            ;;
+        magnet)
+            mime=application/x-bittorrent
+            ;;
+        irc)
+            mime=x-scheme-handler/irc
+            ;;
+    esac
+fi
+
+if [ -e "$*" ]; then
+    mime="$(file -ib "$*" | cut -d';' -f1)"
+fi
+
+[[ -v mimeapps[${mime}] ]] && "${mimeapps["${mime}"]}" "$*" &>/dev/null &

@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+
+# https://gitlab.com/wavexx/acpilight/-/blob/master/xbacklight
+
+import argparse
+
+import os
+from os.path import join as pjoin
+from collections import OrderedDict
+
+PATH = "/sys/class/backlight"
+
+
+def clamp(v, vmin, vmax):
+    return max(min(v, vmax), vmin)
+
+
+def get_controllers():
+    ctrls = OrderedDict()
+    for name in os.listdir(PATH):
+        ctrls[name] = pjoin(PATH, name)
+    return ctrls
+
+
+def read_int(path):
+    with open(path) as f:
+        return int(f.read())
+
+
+def write_int(path, v):
+    with open(path, "w") as f:
+        f.write(str(int(v)))
+
+
+def get_brightness(path):
+    return read_int(pjoin(path, "brightness"))
+
+
+def get_max_brightness(path):
+    return read_int(pjoin(path, "max_brightness"))
+
+
+def set_brightness(path, v):
+    write_int(pjoin(path, "brightness"), int(v))
+
+
+def get_brightness_pc(path, ndecimal=2):
+    return round(get_brightness(path) / get_max_brightness(path), ndecimal)
+
+
+def set_brightness_pc(path, v, ndecimal=2):
+    if not (0 <= v and v <= 1):
+        raise ValueError("Argument must be between 0 and 1")
+    set_brightness(path, round(v, ndecimal) * get_max_brightness(path))
+
+
+def inc_brightness_pc(path, v):
+    v = clamp(get_brightness_pc(path) + v, 0, 1)
+    set_brightness_pc(path, v)
+
+
+def dec_brightness_pc(path, v):
+    v = clamp(get_brightness_pc(path) - v, 0, 1)
+    set_brightness_pc(path, v)
+
+
+def run():
+    def percent_type(v):
+        try:
+            v = float(v)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"{v} must be float.")
+        if not (0 <= v and v <= 1):
+            raise argparse.ArgumentTypeError(f"{v} must be between 0 and 1.")
+        return v
+
+    ap = argparse.ArgumentParser(description="backlight control")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("-list", action="store_true", help="list controllers")
+    g.add_argument("-get", action="store_true", help="get brightness")
+    g.add_argument(
+        "-set", type=percent_type, metavar="PERCENT", help="set brightness 0-1"
+    )
+    g.add_argument(
+        "-inc", type=percent_type, metavar="PERCENT", help="increase brightness 0-1"
+    )
+    g.add_argument(
+        "-dec", type=percent_type, metavar="PERCENT", help="decrease brightness 0-1"
+    )
+    ap.add_argument("-ctrl", help="set controller to use")
+
+    args = ap.parse_args()
+
+    ctrls = get_controllers()
+    if args.list:
+        for name in ctrls:
+            print(name)
+        return
+
+    ctrl_path_def = next(iter(ctrls.values()))
+    ctrl_path = ctrls.get(args.ctrl, ctrl_path_def)
+
+    if args.get:
+        print(get_brightness_pc(ctrl_path))
+    elif args.set is not None:
+        set_brightness_pc(ctrl_path, args.set)
+    elif args.inc is not None:
+        inc_brightness_pc(ctrl_path, args.inc)
+    elif args.dec is not None:
+        dec_brightness_pc(ctrl_path, args.dec)
+
+
+if __name__ == "__main__":
+    run()

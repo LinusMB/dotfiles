@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+set -e -o pipefail
+
+need() {
+    if [ $# -eq 0 ]; then
+        return
+    fi
+
+    if ! hash "$1" 2>/dev/null; then
+        printf 'Need %s on path.\n' "$1"
+        exit 1
+    fi
+
+    shift
+
+    need "$@"
+}
+
+need vim
+
+: "${XDG_DATA_HOME:="${HOME}/.local/share"}"
+
+readonly APP="notes"
+readonly SAVE="${XDG_DATA_HOME}/${APP}"
+readonly FILE="${SAVE}/notes.txt"
+
+mkdir -p "${SAVE}"
+touch "${FILE}"
+
+usage() {
+    printf 'Usage: %s (read|edit)\n' "$0"
+}
+
+new() {
+    readonly TEMP
+    TEMP="$(mktemp)"
+
+    vim "${TEMP}"
+
+    if [ -s "${TEMP}" ]; then
+        {
+            printf -- '--- %s ---' "$(date +"%Y-%m-%d %H:%M:%S")"
+            printf -- "\n\n"
+            cat "${TEMP}"
+            printf -- "\n"
+        } >>"${FILE}"
+    fi
+
+    rm "${TEMP}"
+}
+
+if [ $# -eq 0 ]; then
+    new
+    exit
+fi
+
+case "$1" in
+    r | read)
+        vim -R "${FILE}"
+        ;;
+    e | edit)
+        vim "${FILE}"
+        ;;
+    c | cat)
+        cat "${FILE}"
+        ;;
+    *)
+        usage
+        ;;
+esac

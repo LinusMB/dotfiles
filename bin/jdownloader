@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+set -eu -o pipefail
+
+need() {
+    if [ $# -eq 0 ]; then
+        return
+    fi
+
+    if ! hash "$1" 2>/dev/null; then
+        printf 'Need %s on path.\n' "$1"
+        exit 1
+    fi
+
+    shift
+
+    need "$@"
+}
+
+need docker
+
+application_name="jdownloader-2"
+image_name="jlesage/jdownloader-2"
+
+container_name="${application_name}"
+
+mount_download_source="${XDG_DOWNLOAD_DIR:-${HOME}/Downloads}"
+mount_download_target="/output"
+
+mount_config_source="${XDG_CONFIG_HOME:-${HOME}/.config}/${application_name}"
+mount_config_target="/config"
+
+port_source="5800"
+port_target="5800"
+
+container_id="$(docker container ls -aq -f name=${container_name})"
+
+[ -n "${container_id}" ] && docker container rm "${container_id}"
+
+docker run \
+    -d \
+    --name "${container_name}" \
+    -p "${port_source}:${port_target}" \
+    -v "${mount_config_source}:${mount_config_target}:rw" \
+    -v "${mount_download_source}:${mount_download_target}:rw" \
+    --name "${container_name}" \
+    "${image_name}"
+
+printf 'Starting on http://localhost:%s\n' "${port_source}"

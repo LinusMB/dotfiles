@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+set -eu -o pipefail
+
+need() {
+    if [ $# -eq 0 ]; then
+        return
+    fi
+
+    if ! hash "$1" 2>/dev/null; then
+        printf 'Need %s on path.\n' "$1"
+        exit 1
+    fi
+
+    shift
+
+    need "$@"
+}
+
+need play
+
+minutes="180"
+repeats=$((minutes - 1))
+center="1000"
+wave="0.1"
+noise="brown"
+len="01:00"
+bass="6"
+treble="-3"
+
+play --no-show-progress \
+    -c 2 \
+    --null \
+    synth "${len}" ${noise}noise \
+    band -n "${center}" 499 \
+    tremolo "${wave}" 37 \
+    reverb bass "${bass}" treble "${treble}" \
+    repeat "${repeats}"

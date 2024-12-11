@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# shellcheck enable=require-variable-braces
+
+need() {
+    if [ $# -eq 0 ]; then
+        return
+    fi
+
+    if ! hash "$1" 2>/dev/null; then
+        printf 'Need %s on path.\n' "$1"
+        exit 1
+    fi
+
+    shift
+
+    need "$@"
+}
+
+need dconf
+
+dconf reset -f /
+dconf load / <<EOF
+[org/gnome/desktop/input-sources]
+sources=[('xkb', 'us+altgr-intl')]
+xkb-options=['ctrl:nocaps']
+
+[org/gnome/desktop/interface]
+color-scheme='default'
+cursor-size=32
+document-font-name='Overpass 10'
+enable-animations=false
+font-name='Overpass 10'
+monospace-font-name='Inconsolata 12'
+
+[org/gnome/desktop/wm/keybindings]
+close=['<Super>e']
+minimize=['<Super>q']
+toggle-maximized=['<Super>w']
+move-to-side-e=['<Super>l']
+move-to-side-n=['<Super>k']
+move-to-side-s=['<Super>j']
+move-to-side-w=['<Super>h']
+move-to-workspace-1=['<Super><Shift>1']
+move-to-workspace-2=['<Super><Shift>2']
+move-to-workspace-3=['<Super><Shift>3']
+move-to-workspace-4=['<Super><Shift>4']
+switch-to-workspace-1=['<Super>1']
+switch-to-workspace-2=['<Super>2']
+switch-to-workspace-3=['<Super>3']
+switch-to-workspace-4=['<Super>4']
+
+[org/gnome/settings-daemon/plugins/media-keys]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
+binding='<Super>Return'
+command='alacritty'
+name='Launch terminal'
+
+[org/gnome/desktop/wm/preferences]
+resize-with-right-button=true
+
+[org/gnome/desktop/peripherals/keyboard]
+delay=uint32 200
+repeat-interval=uint32 25
+
+[org/gnome/metacity]
+alt-tab-thumbnails=true
+EOF
