@@ -20,6 +20,7 @@ _packages() {
         jq \
         shellcheck \
         shfmt \
+        xclip \
         black \
         clang-format \
         fonts-inconsolata
@@ -32,6 +33,29 @@ _basic() {
     curl -fLo ~/.inputrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/inputrc
     curl -fLo ~/.alacritty.toml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.toml
     curl -fLo ~/.tmux.conf https://raw.githubusercontent.com/LinusMB/dotfiles/master/tmux.conf
+}
+
+_desktop() {
+    mkdir -p ~/.i3
+
+    sudo apt-get install -y --no-install-recommends \
+        i3-wm \
+        suckless-tools \
+        pcmanfm \
+        imagemagick \
+        feh \
+        udiskie
+
+    convert -size 1920x1080 gradient:"#cc85b5-#491f5f" -blur 0x50 -distort SRT 40 ~/wp.png
+
+    curl -fLo ~/.xinitrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/xinitrc
+    curl -fLo ~/.i3/config https://raw.githubusercontent.com/LinusMB/dotfiles/master/i3config
+
+    cat <<'EOF' >>~/.profile
+if [[ "$(tty)" = "/dev/tty1" ]]; then
+    exec startx
+fi
+EOF
 }
 
 _vim() {
@@ -137,6 +161,13 @@ _vscode() {
                     }
                 ],
             }' "${configfile}" | sponge "${configfile}"
+}
+
+_docker() {
+    sudo apt-get -y update
+    sudo apt-get install -y docker.io
+    sudo usermod -aG docker "$(whoami)"
+    sudo systemctl enable --now docker
 }
 
 _overpassfont() {
