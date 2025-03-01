@@ -34,8 +34,8 @@ usage() {
 }
 
 new() {
-    readonly TEMP
     TEMP="$(mktemp)"
+    readonly TEMP
 
     vim "${TEMP}"
 
