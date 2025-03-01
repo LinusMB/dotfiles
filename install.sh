@@ -13,17 +13,16 @@ _packages() {
         rsync \
         tree \
         tmux \
-        alacritty \
         unzip \
         vim-gtk3 \
         moreutils \
         jq \
         shellcheck \
         shfmt \
+        entr \
         xclip \
         black \
-        clang-format \
-        fonts-inconsolata
+        clang-format
 }
 
 _basic() {
@@ -31,30 +30,109 @@ _basic() {
     curl -fLo ~/.profile https://raw.githubusercontent.com/LinusMB/dotfiles/master/profile
     curl -fLo ~/.gitconfig https://raw.githubusercontent.com/LinusMB/dotfiles/master/gitconfig
     curl -fLo ~/.inputrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/inputrc
-    curl -fLo ~/.alacritty.toml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.toml
     curl -fLo ~/.tmux.conf https://raw.githubusercontent.com/LinusMB/dotfiles/master/tmux.conf
 }
 
 _desktop() {
-    mkdir -p ~/.i3
+    mkdir -p ~/.config/gtk-3.0/
 
     sudo apt-get install -y --no-install-recommends \
-        i3-wm \
         suckless-tools \
         pcmanfm \
+        gvfs-backends \
+        l3afpad \
         imagemagick \
         feh \
-        udiskie
+        mpv \
+        udiskie \
+        xarchiver \
+        network-manager \
+        blueman \
+        pavucontrol \
+        pulseaudio \
+        xinit \
+        x11-xserver-utils \
+        alacritty \
+        gvfs \
+        unrar \
+        ffmpegthumbnailer \
+        gnome-themes-extra \
+        fonts-inconsolata \
+        fonts-noto \
+        volumeicon-alsa \
+        cbatticon \
+        network-manager-gnome \
+        cron \
+        redshift \
+        software-properties-common \
+        metacity \
+        dconf-cli \
+        lxpanel \
+        sxhkd
 
+    sudo apt-add-repository -y --component non-free
+    sudo apt-get -y update
+
+    sudo apt-get install -y --no-install-recommends fonts-ubuntu fonts-ubuntu-console
+
+    curl -fLo ~/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&
+        apt-get install -y ./chrome.deb &&
+        rm ./chrome.deb
+
+    _overpassfont
     convert -size 1920x1080 gradient:"#cc85b5-#491f5f" -blur 0x50 -distort SRT 40 ~/wp.png
 
     curl -fLo ~/.xinitrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/xinitrc
-    curl -fLo ~/.i3/config https://raw.githubusercontent.com/LinusMB/dotfiles/master/i3config
+    curl -fLo ~/.sxhkdrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/sxhkdrc
+    curl -fLo ~/.alacritty.yml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.yml
+
+    sudo sed -i 's/^/#/' /etc/network/interfaces
+    sudo systemctl enable --now NetworkManager
+
+    crontab <<EOF
+0 21 * * * redshift -PO 4500
+EOF
 
     cat <<'EOF' >>~/.profile
 if [[ "$(tty)" = "/dev/tty1" ]]; then
     exec startx
 fi
+EOF
+
+    cat <<'EOF' >~/.gktrc-2.0
+include "/home/linus/.gtkrc-2.0.mine"
+gtk-theme-name="Adwaita-dark"
+gtk-icon-theme-name="hicolor"
+gtk-font-name="Overpass 12"
+gtk-cursor-theme-name="Adwaita"
+gtk-cursor-theme-size=0
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=1
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle="hintfull"
+EOF
+
+    cat <<'EOF' >~/.config/gtk-3.0/settings.ini
+[Settings]
+gtk-theme-name=Adwaita-dark
+gtk-icon-theme-name=hicolor
+gtk-font-name=Overpass 12
+gtk-cursor-theme-name=Adwaita
+gtk-cursor-theme-size=0
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=1
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle=hintfull
 EOF
 }
 
@@ -106,61 +184,14 @@ _golang() {
 }
 
 _vscode() {
+    mkdir -p ~/.config/Code/User
+
     code --install-extension golang.go
     code --install-extension vscodevim.vim
     code --install-extension ms-python.python
     code --install-extension ms-python.black-formatter
 
-    local configfile="~/.config/Code/User/settings.json"
-
-    printf '{}' >"${configfile}"
-    jq '. + {"editor.fontFamily": "Inconsolata"}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"editor.fontSize": 16}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"editor.cursorBlinking": "solid"}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"editor.formatOnSave": true}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"editor.autoClosingBrackets": "never"}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"terminal.integrated.fontSize": 16}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"terminal.integrated.allowChords": false}' "${configfile}" | sponge "${configfile}"
-    jq '. + {
-                "terminal.integrated.commandsToSkipShell": [
-                    "-workbench.action.quickOpen",
-                    "-workbench.action.terminal.deleteWordLeft"
-                ]
-            }' "${configfile}" | sponge "${configfile}"
-    jq '. + {"terminal.integrated.sendKeybindingsToShell":true}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"window.openFilesInNewWindow": "default"}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"vim.useCtrlKeys": true}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"vim.useSystemClipboard": true}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"vim.leader": "<space>"}' "${configfile}" | sponge "${configfile}"
-    jq '. + {"vim.handleKeys": {"<C-j>": true, "<C-k>: true"}}' "${configfile}" | sponge "${configfile}"
-    jq '. + {
-                "vim.normalModeKeyBindingsNonRecursive": [
-                    {
-                        "before": ["<C-k>"],
-                        "after": ["O", "<Esc>", "j"]
-                    },
-                    {
-                        "before": ["<C-j>"],
-                        "after": ["o", "<Esc>", "k"]
-                    },
-                    {
-                        "before": ["<leader>", "g"],
-                        "after": ["g", "d"]
-                    },
-                    {
-                        "before": ["<leader>", "p", "d"],
-                        "commands": ["editor.action.peekDefinition"]
-                    },
-                    {
-                        "before": ["<leader>", "p", "c"],
-                        "commands": ["editor.action.revealDeclaration"]
-                    },
-                    {
-                        "before": ["<leader>", "t"],
-                        "commands": ["workbench.action.quickOpen"]
-                    }
-                ],
-            }' "${configfile}" | sponge "${configfile}"
+    curl -fLo ~/.config/Code/User/setting.json https://raw.githubusercontent.com/LinusMB/dotfiles/master/vscconfig
 }
 
 _docker() {
@@ -191,5 +222,5 @@ _packages
 _basic
 _vim
 _golang
-_overpassfont
 _ktfmt
+_desktop

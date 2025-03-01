@@ -1,0 +1,45 @@
+{
+    "editor.fontFamily": "Inconsolata",
+    "editor.fontSize": 16,
+    "editor.cursorBlinking": "solid",
+    "editor.formatOnSave": true,
+    "editor.autoClosingBrackets": "never",
+    "terminal.integrated.fontSize": 16,
+    "terminal.integrated.allowChords": false,
+    "terminal.integrated.commandsToSkipShell": [
+        "-workbench.action.quickOpen",
+        "-workbench.action.terminal.deleteWordLeft"
+    ],
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "window.openFilesInNewWindow": "default",
+    "vim.useCtrlKeys": true,
+    "vim.useSystemClipboard": true,
+    "vim.leader": "<space>",
+    "vim.handleKeys": {"<C-j>": true, "<C-k>: true"},
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<C-k>"],
+            "after": ["O", "<Esc>", "j"]
+        },
+        {
+            "before": ["<C-j>"],
+            "after": ["o", "<Esc>", "k"]
+        },
+        {
+            "before": ["<leader>", "g"],
+            "after": ["g", "d"]
+        },
+        {
+            "before": ["<leader>", "p", "d"],
+            "commands": ["editor.action.peekDefinition"]
+        },
+        {
+            "before": ["<leader>", "p", "c"],
+            "commands": ["editor.action.revealDeclaration"]
+        },
+        {
+            "before": ["<leader>", "t"],
+            "commands": ["workbench.action.quickOpen"]
+        }
+    ]
+}
