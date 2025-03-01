@@ -13,7 +13,6 @@ _packages() {
         rsync \
         tree \
         tmux \
-        alacritty \
         unzip \
         vim-gtk3 \
         moreutils \
@@ -22,8 +21,7 @@ _packages() {
         shfmt \
         xclip \
         black \
-        clang-format \
-        fonts-inconsolata
+        clang-format
 }
 
 _basic() {
@@ -31,12 +29,12 @@ _basic() {
     curl -fLo ~/.profile https://raw.githubusercontent.com/LinusMB/dotfiles/master/profile
     curl -fLo ~/.gitconfig https://raw.githubusercontent.com/LinusMB/dotfiles/master/gitconfig
     curl -fLo ~/.inputrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/inputrc
-    curl -fLo ~/.alacritty.toml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.toml
     curl -fLo ~/.tmux.conf https://raw.githubusercontent.com/LinusMB/dotfiles/master/tmux.conf
 }
 
 _desktop() {
     mkdir -p ~/.i3
+    mkdir -p ~/.config/gtk-3.0/
 
     sudo apt-get install -y --no-install-recommends \
         i3-wm \
@@ -44,17 +42,62 @@ _desktop() {
         pcmanfm \
         imagemagick \
         feh \
-        udiskie
+        udiskie \
+        xinit \
+        x11-xserver-utils \
+        chromium \
+        alacritty \
+        gvfs \
+        gnome-themes-extra \
+        fonts-inconsolata
 
+    _overpassfont
     convert -size 1920x1080 gradient:"#cc85b5-#491f5f" -blur 0x50 -distort SRT 40 ~/wp.png
 
     curl -fLo ~/.xinitrc https://raw.githubusercontent.com/LinusMB/dotfiles/master/xinitrc
     curl -fLo ~/.i3/config https://raw.githubusercontent.com/LinusMB/dotfiles/master/i3config
+    curl -fLo ~/.alacritty.yml https://raw.githubusercontent.com/LinusMB/dotfiles/master/alacritty.yml
 
     cat <<'EOF' >>~/.profile
 if [[ "$(tty)" = "/dev/tty1" ]]; then
     exec startx
 fi
+EOF
+
+    cat <<'EOF' >~/.gktrc-2.0
+include "/home/linus/.gtkrc-2.0.mine"
+gtk-theme-name="Adwaita-dark"
+gtk-icon-theme-name="hicolor"
+gtk-font-name="Overpass 12"
+gtk-cursor-theme-name="Adwaita"
+gtk-cursor-theme-size=0
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=1
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle="hintfull"
+EOF
+
+    cat <<'EOF' >~/.config/gtk-3.0/settings.ini
+[Settings]
+gtk-theme-name=Adwaita-dark
+gtk-icon-theme-name=hicolor
+gtk-font-name=Overpass 12
+gtk-cursor-theme-name=Adwaita
+gtk-cursor-theme-size=0
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=1
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle=hintfull
 EOF
 }
 
@@ -191,5 +234,4 @@ _packages
 _basic
 _vim
 _golang
-_overpassfont
 _ktfmt

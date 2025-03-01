@@ -1,14 +1,17 @@
 set $mod Mod4
 
 font pango:Overpass 12
+gaps inner 10
+
+for_window [class=".*"] border pixel 2
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
 bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
-bindsym $mod+space exec --no-startup-id dmenu_run -nb #1e1e1e -sb #1e1e1e -nf #fff -sf #aaa -fn Overpass:size=13
-bindsym $mod+Shift+Return exec --no-startup-id $TERMINAL
+bindsym $mod+space exec --no-startup-id dmenu_run -nb "#1e1e1e" -sb "#1e1e1e" -nf "#fff" -sf "#aaa" -fn Overpass:size=13
+bindsym $mod+Return exec --no-startup-id $TERMINAL
 
 floating_modifier $mod
 
@@ -82,6 +85,7 @@ bindsym $mod+Control+k resize shrink height 4 px
 bindsym $mod+Control+l resize grow width 4 px
 
 bar {
-    font pango:Overpass 12
-    position bottom
+    status_command while true; do date "+%Y-%m-%d %H:%M"; sleep 30; done
+    font pango:Inconsolata 13
+    position top
 }
