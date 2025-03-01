@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use POSIX 'strftime';
+
+foreach my $filename (@ARGV)
+{
+    my $mtime = (stat($filename))[9];
+
+    my $newname = strftime("%Y-%m-%dT%H-%M-%S", localtime($mtime));
+
+    if ($filename =~ /(\.[^.]+)$/) {
+        $newname .= $1;
+    }
+
+    rename($filename, $newname);
+}

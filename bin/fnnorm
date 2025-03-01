@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+foreach my $filename (@ARGV)
+{
+    my $newname = $filename;
+
+    $newname = lc($newname);
+    $newname =~ s/[\s-]+/-/g;
+    $newname =~ s/[\(\)\[\]<>\\]/x/g;
+    $newname =~ s/[\'\`]/=/g;
+    $newname =~ s/\&/_and_/g;
+    $newname =~ s/\$/_dol_/g;
+    $newname =~ s/;/:/g;
+
+    if ($filename ne $newname)
+    {
+        if (-f $newname)
+        {
+            my $ext = 0;
+
+            while (-f $newname.".".$ext)
+            {
+                $ext++;
+            }
+            $newname = $newname.".".$ext;
+        }
+        print "$filename -> $newname\n";
+        rename($filename, $newname);
+    }
+}
