@@ -33,6 +33,11 @@ augroup RCShell
     au BufWritePost * if &filetype == 'sh' | silent exec '!shfmt -ci -i 4 -w %' | endif
 augroup END
 
+augroup RCClang
+    au!
+    au BufWritePost *.cpp,*.hpp silent exec '!clang-format -i --style="{BasedOnStyle: llvm, IndentWidth: 4}" %'
+augroup END
+
 augroup RCResized
     au!
     au VimResized * wincmd=
@@ -74,6 +79,43 @@ command! CD cd %:p:h
 command! RemoveTabs :%s/\t/\=repeat(' ', &tabstop)/g
 command! TrimTrailing :%s/\s\+$//g
 
+
+let g:coc_global_extensions = ["coc-tabnine", "coc-clangd", "coc-go", "coc-pyright", "coc-tsserver"]
+
+call coc#config('suggest.noselect', 'true')
+call coc#config('inlayHint.enable', 'false')
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-rename)
+
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+
+
 let mapleader = "\<space>"
 
 noremap <space> <nop>
@@ -93,6 +135,9 @@ onoremap <c-c> <esc>
 
 cnoremap <expr> %% getcmdtype( ) == ':' ? expand('%:p:h').'/' : '%%'
 cnoremap s/ s/\V
+
+nnoremap H ^
+nnoremap L $
 
 nmap <c-p> :e %%<c-d>
 nnoremap - :Ex<cr>
@@ -155,7 +200,7 @@ set noerrorbells vb t_vb=
 set ttyfast lazyredraw
 set nofixendofline
 set number relativenumber ruler showcmd display=lastline
-set ignorecase smartcase matchtime=2 incsearch wrapscan hlsearch
+set ignorecase smartcase matchtime=2 incsearch wrapscan
 set hidden
 set clipboard=unnamed
 if has('unnamedplus')

@@ -1,0 +1,19 @@
+window:
+  padding:
+    x: 5
+    y: 5
+
+font:
+  normal:
+    family: "Inconsolata"
+    style: "Regular"
+  bold:
+    family: "Inconsolata"
+    style: "Bold"
+  size: 10
+
+cursor:
+  style: "Block"
+
+scrolling:
+  history: 1000

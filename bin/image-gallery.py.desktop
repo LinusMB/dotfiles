@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Image Gallery
+Exec=/home/linus/bin/image-gallery.py %F
+Icon=utilities-terminal
+Terminal=false
